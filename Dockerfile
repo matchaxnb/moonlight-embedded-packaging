@@ -1,7 +1,13 @@
-FROM arm32v7/debian:bookworm
+# always pass those two arguments, or this will fail
+ARG ARCH_BASE_IMAGE="super!duper!invalid!tag"
+ARG DEBIAN_VERSION="super!duper!invalid!version"
+FROM ${ARCH_BASE_IMAGE}:${DEBIAN_VERSION}
+ARG DEBIAN_VERSION
+ARG ARCH_BASE_IMAGE
+ARG TARGET
+ENV TARGET=${TARGET}
+ENV DISTRO=${DEBIAN_VERSION}
 
-ENV TARGET=rpi
-ENV DISTRO=bookworm
 
 COPY scripts/install-base-deps.sh /opt/scripts/
 RUN /opt/scripts/install-base-deps.sh && \
