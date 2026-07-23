@@ -38,7 +38,8 @@ sed -i "s/^Maintainer:.*/Maintainer: ${DEBFULLNAME} <${DEBEMAIL}>/" control
 dch -v "${DEB_VERSION}-1" "New upstream release ${DEB_VERSION}"
 cd ..
 
-yes '' | DEB_BUILD_OPTIONS=terse debuild -us -uc 2>&1 | grep -v -E '^(dh_|make\[|make:.*Entering|make:.*Leaving|/usr/bin/cmake|cd obj-|cmake |gmake|gcc |g\+\+ )' | cat
+DEB_BUILD_OPTIONS=terse debuild -us -uc > /tmp/debuild.log 2>&1
+grep -v -E '^(dh_|make\[|make:.*Entering|make:.*Leaving|/usr/bin/cmake|cd obj-|cmake |gmake|gcc |g\+\+ )' /tmp/debuild.log || true
 
 cd /opt/build
 shopt -s extglob
