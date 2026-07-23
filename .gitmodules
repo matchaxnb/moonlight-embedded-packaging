@@ -1,3 +1,0 @@
-[submodule "rpi-userland"]
-	path = rpi-userland
-	url = https://github.com/cgutman/userland.git

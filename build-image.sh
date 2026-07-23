@@ -13,4 +13,4 @@ elif [ "$1" == "riscv64" ]; then
   EXTRA_ARGS="$EXTRA_ARGS --platform linux/riscv64"
 fi
 
-docker buildx build $EXTRA_ARGS -f $DOCKERFILE -t cgutman/moonlight-embedded-packaging:"$1-$2_$3" .
+docker buildx build $EXTRA_ARGS -f $DOCKERFILE -t matchalunatic/moonlight-embedded-packaging:"$1-$2_$3" .

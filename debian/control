@@ -2,13 +2,13 @@ Source: moonlight-embedded
 Section: misc
 Priority: optional
 Maintainer: Cameron Gutman <cameron@moonlight-stream.org>
-Build-Depends: debhelper (>= 10), cmake, uuid-dev, libopus-dev, libexpat1-dev, libasound2-dev, libudev-dev, libavahi-client-dev, libssl-dev, libcurl4-openssl-dev, libevdev-dev, libcec-dev, libp8-platform-dev, EXTRA_BUILD_DEPS
+Build-Depends: debhelper (>= 10), cmake, uuid-dev, libopus-dev, libexpat1-dev, libasound2-dev, libudev-dev, libavahi-client-dev, libssl-dev, libcurl4-openssl-dev, libevdev-dev, libcec-dev, libp8-platform-dev, libdrm-dev, libegl1-mesa-dev, libgles2-mesa-dev, libv4l-dev, libsdl2-dev, libavcodec-dev, libavutil-dev
 Standards-Version: 4.3.0
 Homepage: https://github.com/moonlight-stream/moonlight-embedded
 
 Package: moonlight-embedded
 Architecture: any
-Depends: EXTRA_DEPS, ${shlibs:Depends}, ${misc:Depends}
+Depends: ${shlibs:Depends}, ${misc:Depends}
 Recommends: alsa-base
 Suggests: alsa-utils
 Description: GameStream client for Linux
