@@ -14,10 +14,15 @@ git submodule update --quiet --init --recursive
 if [ -x scripts/version.sh ]; then
   FULL_VERSION=$(bash scripts/version.sh)
 else
-  FULL_VERSION=$(grep project\( CMakeLists.txt | cut -d ' ' -f 3)
+  FULL_VERSION=$(grep -Po 'project\([^)]*VERSION \K[0-9.]+' CMakeLists.txt 2>/dev/null || true)
 fi
 # Debian package version must be major.minor.patch (no tweak component)
 DEB_VERSION=$(echo "$FULL_VERSION" | grep -Eo '^[0-9]+\.[0-9]+\.[0-9]+')
+if [ -z "$DEB_VERSION" ]; then
+  echo "Warning: could not determine version, falling back to 0.0.0"
+  FULL_VERSION="0.0.0"
+  DEB_VERSION="0.0.0"
+fi
 
 mkdir /opt/build
 /opt/scripts/git-archive-all.sh --format tar.gz /opt/build/moonlight-embedded_$FULL_VERSION.orig.tar.gz
