@@ -6,7 +6,7 @@ fail()
 
 git diff-index --quiet HEAD -- || fail "Release builds must not have unstaged changes!"
 
-set -e
+set -euo pipefail
 
 # Build the packages
 ./build-single.sh rpi bookworm $1 &

@@ -1,7 +1,10 @@
-set -e
+#!/usr/bin/env bash
+set -euo pipefail
 
-[[ ! -z "$REPO_URL" ]] || REPO_URL="https://github.com/matchaxnb/moonlight-embedded.git"
-[[ ! -z "$COMMIT" ]] || COMMIT="master"
+REPO_URL="${REPO_URL:-https://github.com/matchaxnb/moonlight-embedded.git}"
+COMMIT="${COMMIT:-master}"
+DEBFULLNAME=${DEBFULLNAME:-"Moonlight CI"}
+DEBEMAIL=${DEBEMAIL:-ci@moonlight-stream.org}
 
 git clone --quiet $REPO_URL
 cd moonlight-embedded
@@ -20,6 +23,7 @@ tar xf ../moonlight-embedded_$VERSION.orig.tar.gz
 
 cp -r /opt/debian .
 cd debian
+sed -i "s/^Maintainer:.*/Maintainer: ${DEBFULLNAME} <${DEBEMAIL}>/" control
 dch -v "${VERSION}-1" "New upstream release ${VERSION}"
 cd ..
 

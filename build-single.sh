@@ -6,7 +6,7 @@ PLATFORM="$1"
 DEBIAN_VERSION="$2"
 TARGET_REF="${3:-master}"
 TARGET_NAME="${PLATFORM}-${DEBIAN_VERSION}"
-TARGET_IMAGE_NAME=${DOCKER_IMAGE_NAME:-matchalunatic/moonlight-embedded-packaging}
+TARGET_IMAGE_NAME=${TARGET_IMAGE_NAME:-matchalunatic/moonlight-embedded-packaging}
 REPO_URL="${REPO_URL:-https://github.com/matchaxnb/moonlight-embedded.git}"
 DEBFULLNAME=${DEBFULLNAME:-"Moonlight CI"}
 DEBEMAIL=${DEBEMAIL:-ci@moonlight-stream.org}
@@ -15,13 +15,12 @@ TAG_NAME="${TARGET_NAME}_${TAG_UNIQUE_ID}"
 OUT_DIR="out_$TARGET_NAME"
 
 set +euo pipefail
-docker pull matchalunatic/moonlight-embedded-packaging:$TAG_NAME
+docker pull ${TARGET_IMAGE_NAME}:$TAG_NAME
 PULL_EXIT_CODE=$?
 set -euo pipefail
 
 rm -rf $OUT_DIR
 
-set -e
 mkdir $OUT_DIR
 
 if [ $PULL_EXIT_CODE -eq 0 ]; then
@@ -32,7 +31,13 @@ else
   echo Built Docker image - ${TARGET_IMAGE_NAME}:$TAG_NAME
 fi
 
-docker run --rm --mount type=bind,source="$(pwd)"/$OUT_DIR,target=/out --mount type=bind,source="$(pwd)"/debian,target=/opt/debian -e COMMIT="${TARGET_REF}" -e REPO_URL="${REPO_URL}" -e DEBFULLNAME="${DEBFULLNAME}" -e DEBEMAIL="${DEBEMAIL}" $TARGET_IMAGE_NAME:$TAG_NAME
+case "$PLATFORM" in
+	rpi) DOCKER_PLATFORM="linux/arm/v7" ;;
+	rpi64) DOCKER_PLATFORM="linux/arm64" ;;
+	*) DOCKER_PLATFORM="linux/amd64" ;;
+esac
+
+docker run --platform $DOCKER_PLATFORM --rm --mount type=bind,source="$(pwd)"/$OUT_DIR,target=/out --mount type=bind,source="$(pwd)"/debian,target=/opt/debian -e COMMIT="${TARGET_REF}" -e REPO_URL="${REPO_URL}" -e DEBFULLNAME="${DEBFULLNAME}" -e DEBEMAIL="${DEBEMAIL}" $TARGET_IMAGE_NAME:$TAG_NAME
 
 # Push the image now if we're building master in GitHub Actions
 if [ $PULL_EXIT_CODE -ne 0 ] && [ "$GITHUB_REF" == "refs/heads/master" ]; then

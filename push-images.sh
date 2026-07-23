@@ -6,18 +6,21 @@ fail()
 
 git diff-index --quiet HEAD -- || fail "Images must not be pushed with uncommitted changes!"
 
-set -e
+set -euo pipefail
+TARGET_IMAGE_NAME=${TARGET_IMAGE_NAME:-matchalunatic/moonlight-embedded-packaging}
 
 TAG_UNIQUE_ID=`git ls-tree HEAD | sha256sum | cut -c-16`
 
-./build-image.sh rpi bookworm $TAG_UNIQUE_ID &
-./build-image.sh rpi64 bookworm $TAG_UNIQUE_ID &
-wait
-./build-image.sh rpi trixie $TAG_UNIQUE_ID &
-./build-image.sh rpi64 trixie $TAG_UNIQUE_ID &
-wait
+for flavor in rpi rpi64; do
+  for distro in trixie bookworm; do
+    ./build-image.sh $flavor $distro $TAG_UNIQUE_ID &
+  done
+  echo "Waiting for flavor $flavor to complete builds..." && wait && echo " done"
+done
 
-docker push matchaxnb/moonlight-embedded-packaging:rpi-bookworm_$TAG_UNIQUE_ID
-docker push matchaxnb/moonlight-embedded-packaging:rpi64-bookworm_$TAG_UNIQUE_ID
-docker push matchaxnb/moonlight-embedded-packaging:rpi-trixie_$TAG_UNIQUE_ID
-docker push matchaxnb/moonlight-embedded-packaging:rpi64-trixie_$TAG_UNIQUE_ID
+for flavor in rpi rpi64; do
+	for distro in trixie bookworm; do
+		docker push ${TARGET_IMAGE_NAME}:${flavor}-${distro}_$TAG_UNIQUE_ID &
+	done
+done
+echo "waiting for all pushes to complete..." && wait && echo " done"
